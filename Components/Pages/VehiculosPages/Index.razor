@@ -1,0 +1,126 @@
+@page "/Vehiculos/Index"
+
+@rendermode InteractiveServer
+
+@inject VehiculosServices VehiculoService
+
+<PageTitle>Vehículos</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header d-flex justify-content-between align-items-center" style="height: 50px;">
+            <h5 class="mb-0">Consulta de Vehículos</h5>
+            <a href="/Vehiculos/Create" class="btn btn-primary">
+                <i class="bi bi-plus"></i>
+                Crear
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="d-flex align-items-end gap-4 flex-wrap">
+                <div>
+                    <label class="form-label"><strong>Filtrar por</strong></label>
+                    <select class="form-select" @bind="Filtro">
+                        <option value="Matricula">Matrícula</option>
+                        <option value="Marca">Marca</option>
+                        <option value="Modelo">Modelo</option>
+                        <option value="Ano">Año</option>
+                        <option value="Color">Color</option>
+                        <option value="Combustible">Combustible</option>
+                        <option value="Transmision">Transmisión</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="form-label"><strong>Búsqueda</strong></label>
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control" placeholder="Buscar..." @bind="ValorFiltro" />
+                        <button class="btn btn-outline-primary" @onclick="Buscar" title="Buscar">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <QuickGrid Items="@Vehiculos.AsQueryable()" Class="table table-bordered mt-3 align-middle">
+                    <PropertyColumn Property="@(v => v.VehiculoId)" Title="ID" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Marca)" Title="Marca" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Modelo)" Title="Modelo" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Ano)" Title="Año" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Matricula)" Title="Matrícula" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Precio)" Title="Precio" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Kilometraje)" Title="Kilometraje" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Combustible)" Title="Combustible" Sortable="true" />
+                    <PropertyColumn Property="@(v => v.Transmision)" Title="Transmisión" Sortable="true" />
+                    <TemplateColumn Title="Acciones">
+                        <div class="d-flex gap-2">
+                            <a href="@($"/Vehiculos/Edit/{context.VehiculoId}")" class="btn btn-warning">
+                                Editar
+                            </a>
+                            <button type="button" class="btn btn-danger" title="Eliminar no está implementado">
+                                Eliminar
+                            </button>
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <p class="mb-0"><strong>Cantidad: </strong>@Vehiculos.Count</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Vehiculos> Vehiculos { get; set; } = new();
+    private string Filtro { get; set; } = "Matricula";
+    private string ValorFiltro { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Vehiculos = (await VehiculoService.GetList(v => true)).Value;
+    }
+
+    private async Task Buscar()
+    {
+        var valor = ValorFiltro.Trim();
+
+        if (Filtro == "Matricula")
+        {
+            Vehiculos = (await VehiculoService.GetList(v => v.Matricula.Contains(valor))).Value;
+        }
+        else if (Filtro == "Marca")
+        {
+            Vehiculos = (await VehiculoService.GetList(v => v.Marca.Contains(valor))).Value;
+        }
+        else if (Filtro == "Modelo")
+        {
+            Vehiculos = (await VehiculoService.GetList(v => v.Modelo.Contains(valor))).Value;
+        }
+        else if (Filtro == "Ano")
+        {
+            if (int.TryParse(valor, out var ano))
+            {
+                Vehiculos = (await VehiculoService.GetList(v => v.Ano == ano)).Value;
+            }
+            else
+            {
+                Vehiculos = new();
+            }
+        }
+        else if (Filtro == "Color")
+        {
+            Vehiculos = (await VehiculoService.GetList(v => v.Color.Contains(valor))).Value;
+        }
+        else if (Filtro == "Combustible")
+        {
+            Vehiculos = (await VehiculoService.GetList(v => v.Combustible.Contains(valor))).Value;
+        }
+        else if (Filtro == "Transmision")
+        {
+            Vehiculos = (await VehiculoService.GetList(v => v.Transmision.Contains(valor))).Value;
+        }
+    }
+}
