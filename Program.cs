@@ -1,8 +1,16 @@
 using AP1_GestorDealer_ProyectoFinal.Components;
+using AP1_GestorDealer_ProyectoFinal.Context;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddBlazorBootstrap();
+
+builder.Services.AddDbContextFactory<Contexto>(
+    o => o.UseSqlServer(
+        builder.Configuration.GetConnectionString("SqlConStr")));
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
