@@ -1,0 +1,114 @@
+@page "/Vehiculos/Create"
+
+@rendermode InteractiveServer
+
+@inject VehiculosServices VehiculoService
+
+<PageTitle>Crear Vehículo</PageTitle>
+
+<EditForm Model="@Vehiculo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header d-flex align-items-center" style="height: 50px;">
+                <h5 class="mb-0">Crear Vehículo</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Marca</strong></label>
+                        <InputText class="form-control" @bind-Value="Vehiculo.Marca" />
+                        <ValidationMessage For="@(() => Vehiculo.Marca)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Modelo</strong></label>
+                        <InputText class="form-control" @bind-Value="Vehiculo.Modelo" />
+                        <ValidationMessage For="@(() => Vehiculo.Modelo)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Año</strong></label>
+                        <InputNumber class="form-control" @bind-Value="Vehiculo.Ano" />
+                        <ValidationMessage For="@(() => Vehiculo.Ano)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Matrícula</strong></label>
+                        <InputText class="form-control" @bind-Value="Vehiculo.Matricula" />
+                        <ValidationMessage For="@(() => Vehiculo.Matricula)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Color</strong></label>
+                        <InputText class="form-control" @bind-Value="Vehiculo.Color" />
+                        <ValidationMessage For="@(() => Vehiculo.Color)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Precio</strong></label>
+                        <InputNumber class="form-control" @bind-Value="Vehiculo.Precio" />
+                        <ValidationMessage For="@(() => Vehiculo.Precio)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Kilometraje</strong></label>
+                        <InputNumber class="form-control" @bind-Value="Vehiculo.Kilometraje" />
+                        <ValidationMessage For="@(() => Vehiculo.Kilometraje)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Combustible</strong></label>
+                        <InputSelect class="form-select" @bind-Value="Vehiculo.Combustible">
+                            <option value="">Seleccione un combustible</option>
+                            <option value="Gasolina">Gasolina</option>
+                            <option value="Gas">Gas</option>
+                            <option value="Gas Oil">Gas Oil</option>
+                            <option value="Electrico">Electrico</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => Vehiculo.Combustible)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Transmisión</strong></label>
+                        <InputSelect class="form-select" @bind-Value="Vehiculo.Transmision">
+                            <option value="">Seleccione una transmisión</option>
+                            <option value="Automatico">Automatico</option>
+                            <option value="Manual">Manual</option>
+                            <option value="Hibrido">Hibrido</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => Vehiculo.Transmision)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Foto (URL)</strong></label>
+                        <InputText class="form-control" @bind-Value="Vehiculo.Foto" />
+                        <ValidationMessage For="@(() => Vehiculo.Foto)" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus"></i>
+                    Crear
+                </button>
+                <a href="/Vehiculos/Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver
+                </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Vehiculos Vehiculo { get; set; } = new() { Ano = DateTime.Now.Year };
+
+    private async Task Guardar()
+    {
+        Vehiculo.Matricula = Vehiculo.Matricula.Trim();
+
+        if (await VehiculoService.ExisteMatricula(Vehiculo.Matricula))
+        {
+            return;
+        }
+
+        await VehiculoService.Guardar(Vehiculo);
+        Vehiculo = new() { Ano = DateTime.Now.Year };
+    }
+}
